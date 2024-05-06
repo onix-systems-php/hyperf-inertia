@@ -37,7 +37,8 @@
         "hyperf/collection": "^3.1",
         "hyperf/resource": "^3.1",
         "hyperf/view-engine": "^3.1",
-        "symfony/process":  "^6.4 | ^v7.0"
+        "symfony/process":  "^6.4 | ^v7.0",
+        "onix-systems-php/hyperf-core": "^1.2"
     },
     "require-dev": {
         "hyperf/testing": "^3.1",
