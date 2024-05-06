@@ -1,12 +1,16 @@
 <?php
 
-$header = <<<'EOF'
-This file is part of the extension library for Hyperf.
+declare(strict_types=1);
+use PhpCsFixer\Config;
+use PhpCsFixer\Finder;
 
-@license  https://github.com/hyperf/hyperf/blob/master/LICENSE
+$header = <<<'EOF'
+This file is part of the Inertia library for Hyperf.
+
+@license  https://github.com/onix-systems-php/hyperf-inertia/blob/main/LICENSE
 EOF;
 
-return (new PhpCsFixer\Config())
+return (new Config())
     ->setRiskyAllowed(true)
     ->setRules([
         '@PSR2' => true,
@@ -79,7 +83,7 @@ return (new PhpCsFixer\Config())
         'multiline_comment_opening_closing' => true,
     ])
     ->setFinder(
-        PhpCsFixer\Finder::create()
+        Finder::create()
             ->exclude('vendor')
             ->in(__DIR__)
     )

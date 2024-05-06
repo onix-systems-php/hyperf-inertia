@@ -17,13 +17,13 @@ Visit [inertiajs.com](https://inertiajs.com/) to learn more.
 - `npm init` init package.json if not exist
 - ```php ./bin/hyperf.php inertia:init ``` Initialize inertia.
 - Add commands to the package.json
-  ```json
+    ```json
     "scripts": {
       "dev": "vite",
       "build": "vite build",
       "build-ssr": "vite build && vite build --ssr" (optional)
     },
-  ```
+    ```
 - ``` npm i ``` install node_modules  packages  
 - Run inertia:
   - ``` npm run dev ``` for development
@@ -46,27 +46,27 @@ Next we need to setup the Inertia middleware, in file `./config/middlewares.php`
 ## Creating responses
 
 ```php
- #[GetMapping(path: '/test', options: ['name' => 'test'])]
-    public function test(RequestInterface $request)
-    {
-        return inertia('Home', ['payload' => 'inertia'])->toResponse($request);
-    }
+#[GetMapping(path: '/test', options: ['name' => 'test'])]
+public function test(RequestInterface $request)
+{
+    return inertia('Home', ['payload' => 'inertia'])->toResponse($request);
+}
 ```
 
 ```php
- #[PostMapping(path: '/test', options: ['name' => 'test'])]
-    public function login(RequestLogin $request, LoginUserService $loginUserService)
-    {
-        try {
-            $loginUserService->run(LoginDTO::make($request), $this->authManager->tokenGuard());
-        } catch (\Exception $exception) {
-            return redirect_with('test', ['alert' => [
-                'type' => 'error',
-                'message' => $exception->getMessage(),
-            ]]);
-        }
-        return redirect_with('test');
+#[PostMapping(path: '/test', options: ['name' => 'test'])]
+public function login(RequestLogin $request, LoginUserService $loginUserService)
+{
+    try {
+        $loginUserService->run(LoginDTO::make($request), $this->authManager->tokenGuard());
+    } catch (\Exception $exception) {
+        return redirect_with('test', ['alert' => [
+            'type' => 'error',
+            'message' => $exception->getMessage(),
+        ]]);
     }
+    return redirect_with('test');
+}
 ```
 
 ## Frontend Part

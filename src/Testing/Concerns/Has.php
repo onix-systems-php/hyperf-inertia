@@ -2,15 +2,16 @@
 
 declare(strict_types=1);
 /**
- * This file is part of the extension library for Hyperf.
+ * This file is part of the Inertia library for Hyperf.
  *
- * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
+ * @license  https://github.com/onix-systems-php/hyperf-inertia/blob/main/LICENSE
  */
 
 namespace OnixSystemsPHP\HyperfInertia\Testing\Concerns;
 
 use Hyperf\Collection\Arr;
 use Hyperf\Collection\Collection;
+use OnixSystemsPHP\HyperfInertia\Testing\Assert;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 trait Has
@@ -32,10 +33,9 @@ trait Has
 
     /**
      * @param mixed $value
-     *
-     * @return $this
+     * @return Assert|Has
      */
-    public function has(string $key, $value = null, \Closure $scope = null): self
+    public function has(string $key, $value = null, ?\Closure $scope = null): self
     {
         PHPUnit::assertTrue(
             Arr::has($this->prop(), $key),
@@ -114,7 +114,7 @@ trait Has
         return $this;
     }
 
-    abstract protected function prop(string $key = null);
+    abstract protected function prop(?string $key = null);
 
     abstract protected function dotPath(string $key): string;
 

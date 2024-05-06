@@ -35,9 +35,11 @@
         "hyperf/command": "^3.1",
         "hyperf/config": "^3.1",
         "hyperf/collection": "^3.1",
+        "hyperf/guzzle": "^3.1",
         "hyperf/resource": "^3.1",
+        "hyperf/stringable": "^3.1",
         "hyperf/view-engine": "^3.1",
-        "symfony/process": "^v6.4.3"
+        "symfony/process": "^6.4 | ^7",
     },
     "require-dev": {
         "hyperf/testing": "^3.1",

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 /**
- * This file is part of the extension library for Hyperf.
+ * This file is part of the Inertia library for Hyperf.
  *
- * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
+ * @license  https://github.com/onix-systems-php/hyperf-inertia/blob/main/LICENSE
  */
 
 namespace OnixSystemsPHP\HyperfInertia\Testing;
@@ -16,7 +16,7 @@ class TestResponseMacros extends TestResponse
 {
     public function assertInertia()
     {
-        return function (\Closure $callback = null) {
+        return function (?\Closure $callback = null) {
             if (class_exists(AssertableJson::class)) {
                 $assert = AssertableInertia::fromTestResponse($this);
             } else {

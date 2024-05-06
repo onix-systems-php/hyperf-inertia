@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 /**
- * This file is part of the extension library for Hyperf.
+ * This file is part of the Inertia library for Hyperf.
  *
- * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
+ * @license  https://github.com/onix-systems-php/hyperf-inertia/blob/main/LICENSE
  */
 
 namespace OnixSystemsPHP\HyperfInertia;
@@ -21,6 +21,7 @@ use Hyperf\ViewEngine\Contract\ViewInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+
 use function Hyperf\Support\call;
 
 class InertiaResponse
@@ -72,7 +73,7 @@ class InertiaResponse
     /**
      * Create an HTTP response that represents the object.
      */
-    public function toResponse(ServerRequestInterface $request): ResponseInterface|JsonResponse|ViewInterface
+    public function toResponse(ServerRequestInterface $request): JsonResponse|ResponseInterface|ViewInterface
     {
         $only = array_filter(explode(',', $request->header('X-Inertia-Partial-Data', '')));
 
@@ -91,7 +92,7 @@ class InertiaResponse
             'version' => $this->version,
         ];
         if ($request->hasHeader('X-Inertia')) {
-            return  (new Response(JsonResource::make($page)->withoutWrapping()))
+            return (new Response(JsonResource::make($page)->withoutWrapping()))
                 ->toResponse()
                 ->addHeader('X-Inertia', 'true');
         }

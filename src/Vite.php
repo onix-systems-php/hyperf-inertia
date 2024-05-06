@@ -1,11 +1,19 @@
 <?php
 
+declare(strict_types=1);
+/**
+ * This file is part of the Inertia library for Hyperf.
+ *
+ * @license  https://github.com/onix-systems-php/hyperf-inertia/blob/main/LICENSE
+ */
+
 namespace OnixSystemsPHP\HyperfInertia;
 
-use Exception;
+use Hyperf\Macroable\Macroable;
+use Hyperf\Stringable\Str;
 use Hyperf\ViewEngine\Contract\Htmlable;
 use Hyperf\ViewEngine\HtmlString;
-use Hyperf\Macroable\Macroable;
+
 use function Hyperf\Collection\collect;
 use function Hyperf\Config\config;
 
@@ -21,12 +29,12 @@ class Vite implements Htmlable
     /**
      * The key to check for integrity hashes within the manifest.
      */
-    protected string|bool $integrityKey = 'integrity';
+    protected bool|string $integrityKey = 'integrity';
 
     /**
      * The configured entry points.
      */
-    protected array  $entryPoints = [];
+    protected array $entryPoints = [];
 
     /**
      * The path to the "hot" file.
@@ -68,139 +76,9 @@ class Vite implements Htmlable
      */
     protected static array $manifests = [];
 
-    /**
-     * Get the preloaded assets.
-     */
-    public function preloadedAssets(): array
-    {
-        return $this->preloadedAssets;
-    }
-
-    /**
-     * Get the Content Security Policy nonce applied to all generated tags.
-     */
-    public function cspNonce(): ?string
-    {
-        return $this->nonce;
-    }
-
     public function __toString(): string
     {
         return $this->toHtml();
-    }
-
-    /**
-     * Generate or set a Content Security Policy nonce to apply to all generated tags.
-     */
-    public function useCspNonce(?string  $nonce = null): string
-    {
-        return $this->nonce = $nonce ?? str_random(40);
-    }
-
-    /**
-     * Use the given key to detect integrity hashes in the manifest.
-     */
-    public function useIntegrityKey(string|bool $key): static
-    {
-        $this->integrityKey = $key;
-
-        return $this;
-    }
-
-    /**
-     * Set the Vite entry points.
-     */
-    public function withEntryPoints(array $entryPoints): static
-    {
-        $this->entryPoints = $entryPoints;
-
-        return $this;
-    }
-
-    /**
-     * Set the filename for the manifest file.
-     */
-    public function useManifestFilename(string $filename): static
-    {
-        $this->manifestFilename = $filename;
-
-        return $this;
-    }
-
-    /**
-     * Get the Vite "hot" file path.
-     */
-    public function hotFile(): string
-    {
-        return $this->hotFile ?? self::getPublicPath('hot');
-    }
-
-    /**
-     * Set the Vite "hot" file path.
-     */
-    public function useHotFile(string $path): static
-    {
-        $this->hotFile = $path;
-
-        return $this;
-    }
-
-    /**
-     * Set the Vite build directory.
-     */
-    public function useBuildDirectory(string $path): static
-    {
-        $this->buildDirectory = $path;
-
-        return $this;
-    }
-
-    /**
-     * Use the given callback to resolve attributes for script tags.
-     *
-     * @param  (callable(string, string, ?array, ?array): array)|array  $attributes
-     */
-    public function useScriptTagAttributes($attributes): static
-    {
-        if (! is_callable($attributes)) {
-            $attributes = fn () => $attributes;
-        }
-
-        $this->scriptTagAttributesResolvers[] = $attributes;
-
-        return $this;
-    }
-
-    /**
-     * Use the given callback to resolve attributes for style tags.
-     *
-     * @param  (callable(string, string, ?array, ?array): array)|array  $attributes
-     */
-    public function useStyleTagAttributes($attributes): static
-    {
-        if (! is_callable($attributes)) {
-            $attributes = fn () => $attributes;
-        }
-
-        $this->styleTagAttributesResolvers[] = $attributes;
-
-        return $this;
-    }
-
-    /**
-     * Use the given callback to resolve attributes for preload tags.
-     *
-     * @param  (callable(string, string, ?array, ?array): (array|false))|array|false  $attributes
-     */
-    public function usePreloadTagAttributes($attributes): static
-    {
-        if (! is_callable($attributes)) {
-            $attributes = fn () => $attributes;
-        }
-
-        $this->preloadTagAttributesResolvers[] = $attributes;
-
-        return $this;
     }
 
     /**
@@ -208,7 +86,7 @@ class Vite implements Htmlable
      *
      * @throws \Exception
      */
-    public function __invoke(string|array $entrypoints, ?string $buildDirectory = null): HtmlString
+    public function __invoke(array|string $entrypoints, ?string $buildDirectory = null): HtmlString
     {
         $entrypoints = collect($entrypoints);
         $buildDirectory ??= $this->buildDirectory;
@@ -301,13 +179,249 @@ class Vite implements Htmlable
             ->sortByDesc(fn ($args) => $this->isCssPath($args[1]))
             ->map(fn ($args) => $this->makePreloadTagForChunk(...$args));
 
-        return new HtmlString($preloads->implode('').$stylesheets->implode('').$scripts->implode(''));
+        return new HtmlString($preloads->implode('') . $stylesheets->implode('') . $scripts->implode(''));
+    }
+
+    /**
+     * Get the preloaded assets.
+     */
+    public function preloadedAssets(): array
+    {
+        return $this->preloadedAssets;
+    }
+
+    /**
+     * Get the Content Security Policy nonce applied to all generated tags.
+     */
+    public function cspNonce(): ?string
+    {
+        return $this->nonce;
+    }
+
+    /**
+     * Generate or set a Content Security Policy nonce to apply to all generated tags.
+     */
+    public function useCspNonce(?string $nonce = null): string
+    {
+        return $this->nonce = $nonce ?? Str::random(40);
+    }
+
+    /**
+     * Use the given key to detect integrity hashes in the manifest.
+     */
+    public function useIntegrityKey(bool|string $key): static
+    {
+        $this->integrityKey = $key;
+
+        return $this;
+    }
+
+    /**
+     * Set the Vite entry points.
+     */
+    public function withEntryPoints(array $entryPoints): static
+    {
+        $this->entryPoints = $entryPoints;
+
+        return $this;
+    }
+
+    /**
+     * Set the filename for the manifest file.
+     */
+    public function useManifestFilename(string $filename): static
+    {
+        $this->manifestFilename = $filename;
+
+        return $this;
+    }
+
+    /**
+     * Get the Vite "hot" file path.
+     */
+    public function hotFile(): string
+    {
+        return $this->hotFile ?? self::getPublicPath('hot');
+    }
+
+    /**
+     * Set the Vite "hot" file path.
+     */
+    public function useHotFile(string $path): static
+    {
+        $this->hotFile = $path;
+
+        return $this;
+    }
+
+    /**
+     * Set the Vite build directory.
+     */
+    public function useBuildDirectory(string $path): static
+    {
+        $this->buildDirectory = $path;
+
+        return $this;
+    }
+
+    /**
+     * Use the given callback to resolve attributes for script tags.
+     *
+     * @param array|(callable(string, string, ?array, ?array): array) $attributes
+     */
+    public function useScriptTagAttributes($attributes): static
+    {
+        if (! is_callable($attributes)) {
+            $attributes = fn () => $attributes;
+        }
+
+        $this->scriptTagAttributesResolvers[] = $attributes;
+
+        return $this;
+    }
+
+    /**
+     * Use the given callback to resolve attributes for style tags.
+     *
+     * @param array|(callable(string, string, ?array, ?array): array) $attributes
+     */
+    public function useStyleTagAttributes($attributes): static
+    {
+        if (! is_callable($attributes)) {
+            $attributes = fn () => $attributes;
+        }
+
+        $this->styleTagAttributesResolvers[] = $attributes;
+
+        return $this;
+    }
+
+    /**
+     * Use the given callback to resolve attributes for preload tags.
+     *
+     * @param array|(callable(string, string, ?array, ?array): (array|false))|false $attributes
+     */
+    public function usePreloadTagAttributes($attributes): static
+    {
+        if (! is_callable($attributes)) {
+            $attributes = fn () => $attributes;
+        }
+
+        $this->preloadTagAttributesResolvers[] = $attributes;
+
+        return $this;
+    }
+
+    /**
+     * Generate React refresh runtime script.
+     */
+    public function reactRefresh(): ?HtmlString
+    {
+        if (! $this->isRunningHot()) {
+            return null;
+        }
+
+        $attributes = $this->parseAttributes([
+            'nonce' => $this->cspNonce(),
+        ]);
+
+        return new HtmlString(
+            sprintf(
+                <<<'HTML'
+                <script type="module" %s>
+                    import RefreshRuntime from '%s'
+                    RefreshRuntime.injectIntoGlobalHook(window)
+                    window.$RefreshReg$ = () => {}
+                    window.$RefreshSig$ = () => (type) => type
+                    window.__vite_plugin_react_preamble_installed__ = true
+                </script>
+                HTML,
+                implode(' ', $attributes),
+                $this->hotAsset('@react-refresh')
+            )
+        );
+    }
+
+    /**
+     * Get the URL for an asset.
+     */
+    public function asset(string $asset, ?string $buildDirectory = null): string
+    {
+        $buildDirectory ??= $this->buildDirectory;
+
+        if ($this->isRunningHot()) {
+            return $this->hotAsset($asset);
+        }
+
+        $chunk = $this->chunk($this->manifest($buildDirectory), $asset);
+
+        return $this->assetPath($buildDirectory . '/' . $chunk['file']);
+    }
+
+    /**
+     * Get the content of a given asset.
+     * @throws \Exception
+     */
+    public function content(string $asset, ?string $buildDirectory = null): string
+    {
+        $buildDirectory ??= $this->buildDirectory;
+        $chunk = $this->chunk($this->manifest($buildDirectory), $asset);
+        $path = self::getPublicPath($buildDirectory . '/' . $buildDirectory . '/' . $chunk['file']);
+
+        if (! is_file($path) || ! file_exists($path)) {
+            throw new \Exception("Unable to locate file from Vite manifest: {$path}.");
+        }
+
+        return file_get_contents($path);
+    }
+
+    /**
+     * Get a unique hash representing the current manifest, or null if there is no manifest.
+     */
+    public function manifestHash(?string $buildDirectory = null): ?string
+    {
+        $buildDirectory ??= $this->buildDirectory;
+
+        if ($this->isRunningHot()) {
+            return null;
+        }
+
+        if (! is_file($path = $this->manifestPath($buildDirectory))) {
+            return null;
+        }
+
+        return md5_file($path) ?: null;
+    }
+
+    public static function getPublicPath(string $path): string
+    {
+        return config('inertia.public_path_prefix') . (
+            $path != ''
+                ? DIRECTORY_SEPARATOR . ltrim($path, DIRECTORY_SEPARATOR) :
+                ''
+        );
+    }
+
+    /**
+     * Determine if the HMR server is running.
+     */
+    public function isRunningHot(): bool
+    {
+        return is_file($this->hotFile());
+    }
+
+    /**
+     * Get the Vite tag content as a string of HTML.
+     */
+    public function toHtml(): string
+    {
+        return $this->__invoke($this->entryPoints)->toHtml();
     }
 
     /**
      * Make tag for the given chunk.
      */
-    protected function makeTagForChunk(string $src, string $url, array|null $chunk, array|null $manifest): string
+    protected function makeTagForChunk(string $src, string $url, ?array $chunk, ?array $manifest): string
     {
         if (
             $this->nonce === null
@@ -346,7 +460,7 @@ class Vite implements Htmlable
             collect($attributes)->forget('href')->all()
         );
 
-        return '<link '.implode(' ', $this->parseAttributes($attributes)).' />';
+        return '<link ' . implode(' ', $this->parseAttributes($attributes)) . ' />';
     }
 
     /**
@@ -392,7 +506,7 @@ class Vite implements Htmlable
     /**
      * Resolve the attributes for the chunks generated preload tag.
      */
-    protected function resolvePreloadTagAttributes(string $src, string $url, array $chunk, array$manifest): array|bool
+    protected function resolvePreloadTagAttributes(string $src, string $url, array $chunk, array $manifest): array|bool
     {
         $attributes = $this->isCssPath($url) ? [
             'rel' => 'preload',
@@ -425,35 +539,15 @@ class Vite implements Htmlable
     /**
      * Generate an appropriate tag for the given URL in HMR mode.
      *
-     * @deprecated Will be removed in a future Laravel version.
+     * @deprecated will be removed in a future Laravel version
      */
     protected function makeTag(string $url): string
     {
         if ($this->isCssPath($url)) {
-            return $this->makeStylesheetTag($url);
+            return $this->makeStylesheetTagWithAttributes($url, []);
         }
 
-        return $this->makeScriptTag($url);
-    }
-
-    /**
-     * Generate a script tag for the given URL.
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     */
-    protected function makeScriptTag(string $url): string
-    {
         return $this->makeScriptTagWithAttributes($url, []);
-    }
-
-    /**
-     * Generate a stylesheet tag for the given URL in HMR mode.
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     */
-    protected function makeStylesheetTag(string $url): string
-    {
-        return $this->makeStylesheetTagWithAttributes($url, []);
     }
 
     /**
@@ -467,7 +561,7 @@ class Vite implements Htmlable
             'nonce' => $this->nonce ?? false,
         ], $attributes));
 
-        return '<script '.implode(' ', $attributes).'></script>';
+        return '<script ' . implode(' ', $attributes) . '></script>';
     }
 
     /**
@@ -481,7 +575,7 @@ class Vite implements Htmlable
             'nonce' => $this->nonce ?? false,
         ], $attributes));
 
-        return '<link '.implode(' ', $attributes).' />';
+        return '<link ' . implode(' ', $attributes) . ' />';
     }
 
     /**
@@ -494,89 +588,24 @@ class Vite implements Htmlable
 
     /**
      * Parse the attributes into key="value" strings.
-     *
-     * @param  array  $attributes
-     * @return array
      */
     protected function parseAttributes(array $attributes): array
     {
         return collect($attributes)
             ->reject(fn ($value, $key) => in_array($value, [false, null], true))
             ->flatMap(fn ($value, $key) => $value === true ? [$key] : [$key => $value])
-            ->map(fn ($value, $key) => is_int($key) ? $value : $key.'="'.$value.'"')
+            ->map(fn ($value, $key) => is_int($key) ? $value : $key . '="' . $value . '"')
             ->values()
             ->all();
     }
 
     /**
-     * Generate React refresh runtime script.
-     */
-    public function reactRefresh(): ?HtmlString
-    {
-        if (! $this->isRunningHot()) {
-            return null;
-        }
-
-        $attributes = $this->parseAttributes([
-            'nonce' => $this->cspNonce(),
-        ]);
-
-        return new HtmlString(
-            sprintf(
-                <<<'HTML'
-                <script type="module" %s>
-                    import RefreshRuntime from '%s'
-                    RefreshRuntime.injectIntoGlobalHook(window)
-                    window.$RefreshReg$ = () => {}
-                    window.$RefreshSig$ = () => (type) => type
-                    window.__vite_plugin_react_preamble_installed__ = true
-                </script>
-                HTML,
-                implode(' ', $attributes),
-                $this->hotAsset('@react-refresh')
-            )
-        );
-    }
-
-    /**
      * Get the path to a given asset when running in HMR mode.
+     * @param mixed $asset
      */
     protected function hotAsset($asset): string
     {
-        return rtrim(file_get_contents($this->hotFile())).'/'.$asset;
-    }
-
-    /**
-     * Get the URL for an asset.
-     */
-    public function asset(string $asset, string|null $buildDirectory = null): string
-    {
-        $buildDirectory ??= $this->buildDirectory;
-
-        if ($this->isRunningHot()) {
-            return $this->hotAsset($asset);
-        }
-
-        $chunk = $this->chunk($this->manifest($buildDirectory), $asset);
-
-        return $this->assetPath($buildDirectory.'/'.$chunk['file']);
-    }
-
-    /**
-     * Get the content of a given asset.
-     * @throws \Exception
-     */
-    public function content(string $asset, ?string $buildDirectory = null): string
-    {
-        $buildDirectory ??= $this->buildDirectory;
-        $chunk = $this->chunk($this->manifest($buildDirectory), $asset);
-        $path = self::getPublicPath($buildDirectory . '/' . $buildDirectory . '/' . $chunk['file']);
-
-        if (! is_file($path) || ! file_exists($path)) {
-            throw new Exception("Unable to locate file from Vite manifest: {$path}.");
-        }
-
-        return file_get_contents($path);
+        return rtrim(file_get_contents($this->hotFile())) . '/' . $asset;
     }
 
     /**
@@ -584,7 +613,7 @@ class Vite implements Htmlable
      */
     protected function assetPath(string $path): string
     {
-        return config('inertia.asset_public_path') . DIRECTORY_SEPARATOR.ltrim($path, DIRECTORY_SEPARATOR);
+        return config('inertia.asset_public_path') . DIRECTORY_SEPARATOR . ltrim($path, DIRECTORY_SEPARATOR);
     }
 
     /**
@@ -598,7 +627,7 @@ class Vite implements Htmlable
 
         if (! isset(static::$manifests[$path])) {
             if (! is_file($path)) {
-                throw new ViteManifestNotFoundException("Vite manifest not found at: $path");
+                throw new ViteManifestNotFoundException("Vite manifest not found at: {$path}");
             }
 
             static::$manifests[$path] = json_decode(file_get_contents($path), true);
@@ -612,25 +641,7 @@ class Vite implements Htmlable
      */
     protected function manifestPath(string $buildDirectory): string
     {
-        return self::getPublicPath($buildDirectory.'/'.$this->manifestFilename);
-    }
-
-    /**
-     * Get a unique hash representing the current manifest, or null if there is no manifest.
-     */
-    public function manifestHash(string|null $buildDirectory = null): null|string
-    {
-        $buildDirectory ??= $this->buildDirectory;
-
-        if ($this->isRunningHot()) {
-            return null;
-        }
-
-        if (! is_file($path = $this->manifestPath($buildDirectory))) {
-            return null;
-        }
-
-        return md5_file($path) ?: null;
+        return self::getPublicPath($buildDirectory . '/' . $this->manifestFilename);
     }
 
     /**
@@ -641,33 +652,9 @@ class Vite implements Htmlable
     protected function chunk(array $manifest, string $file): array
     {
         if (! isset($manifest[$file])) {
-            throw new Exception("Unable to locate file in Vite manifest: {$file}.");
+            throw new \Exception("Unable to locate file in Vite manifest: {$file}.");
         }
 
         return $manifest[$file];
-    }
-
-    public static function getPublicPath(string $path): string
-    {
-        return config('inertia.public_path_prefix').($path != ''
-                ? DIRECTORY_SEPARATOR.ltrim($path, DIRECTORY_SEPARATOR) :
-                ''
-            );
-    }
-
-    /**
-     * Determine if the HMR server is running.
-     */
-    public function isRunningHot(): bool
-    {
-        return is_file($this->hotFile());
-    }
-
-    /**
-     * Get the Vite tag content as a string of HTML.
-     */
-    public function toHtml(): string
-    {
-        return $this->__invoke($this->entryPoints)->toHtml();
     }
 }

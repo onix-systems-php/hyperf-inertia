@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 /**
- * This file is part of the extension library for Hyperf.
+ * This file is part of the Inertia library for Hyperf.
  *
- * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
+ * @license  https://github.com/onix-systems-php/hyperf-inertia/blob/main/LICENSE
  */
 
 namespace OnixSystemsPHP\HyperfInertia\Testing;
@@ -15,18 +15,15 @@ use Hyperf\ViewEngine\Finder;
 use PHPUnit\Framework\Assert as PHPUnit;
 use PHPUnit\Framework\AssertionFailedError;
 
-use function FriendsOfHyperf\Helpers\app;
 use function Hyperf\Config\config;
+use function Hyperf\Support\make;
 
 class AssertableInertia extends AssertableJson
 {
-    /** @var string */
     private string $component;
 
-    /** @var string */
     private string $url;
 
-    /** @var null|string */
     private ?string $version;
 
     public static function fromTestResponse(TestResponse $response): self
@@ -52,13 +49,13 @@ class AssertableInertia extends AssertableJson
         return $instance;
     }
 
-    public function component(string $value = null, $shouldExist = null): self
+    public function component(?string $value = null, $shouldExist = null): self
     {
         PHPUnit::assertSame($value, $this->component, 'Unexpected Inertia page component.');
 
         if ($shouldExist || (is_null($shouldExist) && config('inertia.testing.ensure_pages_exist', true))) {
             try {
-                $fileViewFinder = app()->get(Finder::class);
+                $fileViewFinder = make(Finder::class);
                 $fileViewFinder->find($value);
             } catch (\InvalidArgumentException $exception) {
                 PHPUnit::fail(sprintf('Inertia page component file [%s] does not exist.', $value));

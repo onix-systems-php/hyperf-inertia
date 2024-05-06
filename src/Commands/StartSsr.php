@@ -1,10 +1,10 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
 /**
- * This file is part of the extension library for Hyperf.
+ * This file is part of the Inertia library for Hyperf.
  *
- * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
+ * @license  https://github.com/onix-systems-php/hyperf-inertia/blob/main/LICENSE
  */
 
 namespace OnixSystemsPHP\HyperfInertia\Commands;
@@ -14,6 +14,7 @@ use Hyperf\Command\Command as HyperfCommand;
 use OnixSystemsPHP\HyperfInertia\Ssr\BundleDetector;
 use OnixSystemsPHP\HyperfInertia\Ssr\SsrException;
 use Symfony\Component\Process\Process;
+
 use function Hyperf\Config\config;
 
 #[Command]

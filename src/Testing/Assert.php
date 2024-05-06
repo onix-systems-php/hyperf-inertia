@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 /**
- * This file is part of the extension library for Hyperf.
+ * This file is part of the Inertia library for Hyperf.
  *
- * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
+ * @license  https://github.com/onix-systems-php/hyperf-inertia/blob/main/LICENSE
  */
 
 namespace OnixSystemsPHP\HyperfInertia\Testing;
@@ -38,7 +38,7 @@ class Assert implements Arrayable
     /** @var string */
     private $path;
 
-    protected function __construct(string $component, array $props, string $url, string $version = null, string $path = null)
+    protected function __construct(string $component, array $props, string $url, ?string $version = null, ?string $path = null)
     {
         echo "\033[0;31mInertia's built-in 'Assert' library will be removed in a future version of inertia-laravel:\033[0m\n";
         echo "\033[0;31m - If you are seeing this error while using \$response->assertInertia(...), please upgrade to Laravel 8.32.0 or higher.\033[0m\n";

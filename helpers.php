@@ -2,17 +2,18 @@
 
 declare(strict_types=1);
 /**
- * This file is part of the extension library for Hyperf.
+ * This file is part of the Inertia library for Hyperf.
  *
- * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
+ * @license  https://github.com/onix-systems-php/hyperf-inertia/blob/main/LICENSE
  */
-
 use Hyperf\Context\ApplicationContext;
+use Hyperf\Context\Context;
 use Hyperf\Contract\Arrayable;
 use Hyperf\Contract\SessionInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
 use OnixSystemsPHP\HyperfInertia\Inertia;
-use function \Hyperf\Collection\collect;
+
+use function Hyperf\Collection\collect;
 
 if (! function_exists('inertia')) {
     /**
@@ -23,13 +24,14 @@ if (! function_exists('inertia')) {
      */
     function inertia($component = null, $props = [])
     {
-        $instance = ApplicationContext::getContainer()->get(Inertia::class);
+        /** @var Inertia $inertia */
+        $inertia = Context::get(Inertia::class, new Inertia());
 
         if ($component) {
-            return $instance->render($component, $props);
+            return $inertia->render($component, $props);
         }
 
-        return $instance;
+        return $inertia;
     }
 }
 
@@ -38,7 +40,7 @@ if (! function_exists('redirect_with')) {
     {
         $response = ApplicationContext::getContainer()->get(ResponseInterface::class);
         $session = ApplicationContext::getContainer()->get(SessionInterface::class);
-        collect($data)->each(fn($value, $key) => $session->flash($key, $value));
+        collect($data)->each(fn ($value, $key) => $session->flash($key, $value));
 
         return $response->redirect($path);
     }
@@ -47,11 +49,12 @@ if (! function_exists('inertia_location')) {
     /**
      * Inertia location helper.
      *
-     * @param  string  url
-     * @param mixed $url
+     * @param string $url
      */
     function inertia_location($url)
     {
-        return ApplicationContext::getContainer()->get(Inertia::class)->location($url);
+        /** @var Inertia $inertia */
+        $inertia = Context::get(Inertia::class, new Inertia());
+        return $inertia->location($url);
     }
 }

@@ -1,25 +1,25 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
 /**
- * This file is part of the extension library for Hyperf.
+ * This file is part of the Inertia library for Hyperf.
  *
- * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
+ * @license  https://github.com/onix-systems-php/hyperf-inertia/blob/main/LICENSE
  */
 
 namespace OnixSystemsPHP\HyperfInertia;
 
-use Hyperf\HttpServer\Contract\RequestInterface;
+use Hyperf\Context\Context;
+use Hyperf\ViewEngine\Http\Middleware\ValidationExceptionHandle as BaseValidationExceptionHandler;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+
 use function Hyperf\Collection\collect;
 use function Hyperf\Config\config;
-use  Hyperf\ViewEngine\Http\Middleware\ValidationExceptionHandle as BaseValidationExceptionHandler;
 
 class Middleware extends BaseValidationExceptionHandler
 {
-
     protected string $rootView = 'app';
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
@@ -27,14 +27,14 @@ class Middleware extends BaseValidationExceptionHandler
         $url = $request->getUri()->getPath();
         $this->session->setPreviousUrl($url);
 
-        if($this->isSkipped($url)) {
+        if ($this->isSkipped($url)) {
             return $handler->handle($request);
         }
 
-        $inertiaContainer = $this->container->get(Inertia::class);
-        $requestContainer = $this->container->get(RequestInterface::class);
-        $inertiaContainer->version(fn() => $this->version($request));
-        $inertiaContainer->share($this->share($request));
+        $inertia = new Inertia();
+        $inertia->version(fn () => $this->version($request));
+        $inertia->share($this->share($request));
+        Context::set(Inertia::class, $inertia);
 
         $response = parent::process($request, $handler);
 
@@ -44,12 +44,12 @@ class Middleware extends BaseValidationExceptionHandler
             return $response;
         }
         if ($request->getMethod() === 'GET'
-            && $requestContainer->header('X-Inertia-Version', '') !== $inertiaContainer->getVersion()
+            && $request->header('X-Inertia-Version', '') !== $inertia->getVersion()
         ) {
             $response = $this->onVersionChange($request, $response);
         }
 
-        if ($response->isOk() && empty($response->getBody())) {
+        if ($response->getStatusCode() === 200 && empty($response->getBody())) {
             $response = $this->onEmptyResponse($request, $response);
         }
 
@@ -91,7 +91,6 @@ class Middleware extends BaseValidationExceptionHandler
      */
     public function share(ServerRequestInterface $request): array
     {
-
         return [
             'errors' => function () use ($request) {
                 return $this->resolveValidationErrors($request);
@@ -106,7 +105,7 @@ class Middleware extends BaseValidationExceptionHandler
      */
     public function rootView(): string
     {
-      return config('inertia.root_view', $this->rootView);
+        return config('inertia.root_view', $this->rootView);
     }
 
     /**
@@ -115,7 +114,7 @@ class Middleware extends BaseValidationExceptionHandler
      */
     public function onEmptyResponse(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-       return $response->redirect($request->getUri()->getPath());
+        return $response->redirect($request->getUri()->getPath());
     }
 
     /**
@@ -124,8 +123,8 @@ class Middleware extends BaseValidationExceptionHandler
      */
     public function onVersionChange(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-        $container =  $this->container->get(Inertia::class);
-        return $container->location($request->getUri());
+        $inertia = Context::get(Inertia::class);
+        return $inertia->location($request->getUri());
     }
 
     /**
@@ -134,18 +133,16 @@ class Middleware extends BaseValidationExceptionHandler
      */
     public function resolveValidationErrors(ServerRequestInterface $request): object
     {
-        $this->session->has('errors');
         if (! $this->session->has('errors')) {
-            return (object)[];
+            return (object) [];
         }
 
-        return (object)collect($this->session->get('errors')->getBags())->map(function ($bag) {
-            return (object)collect($bag->messages())->map(function ($errors) {
+        return (object) collect($this->session->get('errors')->getBags())->map(function ($bag) {
+            return (object) collect($bag->messages())->map(function ($errors) {
                 return $errors[0];
             })->toArray();
         })->pipe(function ($bags) use ($request) {
             if ($bags->has('default') && $request->getHeader('x-inertia-error-bag')) {
-                $request = $this->container->get(RequestInterface::class);
                 return [$request->header('x-inertia-error-bag') => $bags->get('default')];
             }
 

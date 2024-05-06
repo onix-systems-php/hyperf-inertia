@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 /**
- * This file is part of the extension library for Hyperf.
+ * This file is part of the Inertia library for Hyperf.
  *
- * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
+ * @license  https://github.com/onix-systems-php/hyperf-inertia/blob/main/LICENSE
  */
 
 namespace OnixSystemsPHP\HyperfInertia;
@@ -12,24 +12,26 @@ namespace OnixSystemsPHP\HyperfInertia;
 use Hyperf\Collection\Arr;
 use Hyperf\Context\ApplicationContext;
 use Hyperf\Contract\Arrayable;
+use Hyperf\HttpMessage\Stream\SwooleStream;
 use Hyperf\HttpMessage\Uri\Uri;
-use Hyperf\HttpMessage\Base\Response;
+use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\Macroable\Macroable;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
+
 use function Hyperf\Config\config;
 use function Hyperf\Support\call;
 
 class Inertia
 {
     use Macroable;
+
     protected string $rootView = 'app';
 
     protected array $sharedProps = [];
 
     protected null|\Closure|string $version = null;
 
-    public function __construct(private readonly ServerRequestInterface $request)
+    public function __construct()
     {
         $this->rootView = config('inertia.root_view', $this->rootView);
     }
@@ -50,7 +52,7 @@ class Inertia
         }
     }
 
-    public function getShared(string $key = null, mixed$default = null): mixed
+    public function getShared(?string $key = null, mixed $default = null): mixed
     {
         if ($key) {
             return Arr::get($this->sharedProps, $key, $default);
@@ -82,6 +84,7 @@ class Inertia
     {
         return new LazyProp($callback);
     }
+
     public function render(string $component, array|Arrayable $props = []): InertiaResponse
     {
         if ($props instanceof Arrayable) {
@@ -96,16 +99,17 @@ class Inertia
         );
     }
 
-    public function location( string|Uri $url): ResponseInterface
+    public function location(string|Uri $url): ResponseInterface
     {
-        $response = ApplicationContext::getContainer()->get(Response::class);
-        if ($this->request->hasHeader('X-Inertia')) {
+        $response = ApplicationContext::getContainer()->get(ResponseInterface::class);
+        $request = ApplicationContext::getContainer()->get(RequestInterface::class);
+        if ($request->hasHeader('X-Inertia')) {
             return $response
                 ->withStatus(409)
                 ->withAddedHeader('X-Inertia-Location', $url instanceof Uri ? $url->toString() : $url)
-                ->withBody(new \Hyperf\HttpMessage\Stream\SwooleStream(''));
+                ->withBody(new SwooleStream(''));
         }
 
-        return $url instanceof Uri ? $url->toString() : Redirect::away($url); // notice refactor to hyperf
+        return $response->redirect($url instanceof Uri ? $url->toString() : $url);
     }
 }
