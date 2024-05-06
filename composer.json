@@ -37,6 +37,7 @@
         "hyperf/collection": "^3.1",
         "hyperf/guzzle": "^3.1",
         "hyperf/resource": "^3.1",
+        "hyperf/session": "^3.1",
         "hyperf/stringable": "^3.1",
         "hyperf/view-engine": "^3.1",
         "symfony/process": "^6.4 | ^7.0"
