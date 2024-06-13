@@ -12,8 +12,10 @@ use function Hyperf\Support\env;
 return [
     'root_view' => 'inertia',
     'public_path_prefix' => __DIR__ . '/../../storage/public',
-    'asset_public_path' => env('domain_api') . '/public',
-    'skip_url_prefix' => ['v1'],
+    'asset_public_path' => env('DOMAIN_API') . '/public',
+    'skip_url_prefix' => env('SKIP_URL_PREFIX', []),
+    'is_secure' => env('INERTIA_IS_SECURE', true),
+
 
 
     /*
