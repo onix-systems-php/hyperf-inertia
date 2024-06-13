@@ -24,9 +24,11 @@ class Middleware extends BaseValidationExceptionHandler
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $url = $request->getUri()->getPath();
-        $this->session->setPreviousUrl($url);
+        $request->getUri()->setScheme(config('inertia.is_secure') ? 'https' : 'http');
 
+        $this->session->setPreviousUrl($request->url());
+
+        $url = $request->getUri()->getPath();
         if ($this->isSkipped($url)) {
             return $handler->handle($request);
         }
@@ -43,6 +45,7 @@ class Middleware extends BaseValidationExceptionHandler
         if (! $request->hasHeader('X-Inertia')) {
             return $response;
         }
+
         if ($request->getMethod() === 'GET'
             && $request->header('X-Inertia-Version', '') !== $inertia->getVersion()
         ) {
@@ -56,8 +59,6 @@ class Middleware extends BaseValidationExceptionHandler
         if ($response->getStatusCode() === 302 && in_array($request->getMethod(), ['POST', 'PUT', 'PATCH', 'DELETE'])) {
             $response = $response->withStatus(303);
         }
-
-        $this->session->setPreviousUrl('');
 
         return $response;
     }
@@ -73,12 +74,16 @@ class Middleware extends BaseValidationExceptionHandler
             return md5(config('app.asset_url'));
         }
 
-        if (file_exists($manifest = Vite::getPublicPath('/mix-manifest.json'))) {
-            return md5_file($manifest);
-        }
+        $manifestPaths = [
+            '/mix-manifest.json',
+            '/build/manifest.json'
+        ];
 
-        if (file_exists($manifest = Vite::getPublicPath('/build/manifest.json'))) {
-            return md5_file($manifest);
+        foreach ($manifestPaths as $manifestPath) {
+            $manifest = Vite::getPublicPath($manifestPath);
+            if (file_exists($manifest)) {
+                return md5_file($manifest);
+            }
         }
 
         return null;
