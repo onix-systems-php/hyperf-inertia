@@ -47,7 +47,7 @@ class Middleware extends BaseValidationExceptionHandler
         }
 
         if ($request->getMethod() === 'GET'
-            && $request->header('X-Inertia-Version', '') !== $inertia->getVersion()
+            && $request->getHeaderLine('X-Inertia-Version', '') !== $inertia->getVersion()
         ) {
             $response = $this->onVersionChange($request, $response);
         }
@@ -147,8 +147,8 @@ class Middleware extends BaseValidationExceptionHandler
                 return $errors[0];
             })->toArray();
         })->pipe(function ($bags) use ($request) {
-            if ($bags->has('default') && $request->getHeader('x-inertia-error-bag')) {
-                return [$request->header('x-inertia-error-bag') => $bags->get('default')];
+            if ($bags->has('default') && $request->hasHeader('x-inertia-error-bag')) {
+                return [$request->getHeaderLine('x-inertia-error-bag') => $bags->get('default')];
             }
 
             if ($bags->has('default')) {

@@ -75,9 +75,9 @@ class InertiaResponse
      */
     public function toResponse(ServerRequestInterface $request): JsonResponse|ResponseInterface|ViewInterface
     {
-        $only = array_filter(explode(',', $request->header('X-Inertia-Partial-Data', '')));
+        $only = array_filter(explode(',', $request->getHeaderLine('X-Inertia-Partial-Data')));
 
-        $props = ($only && $request->header('X-Inertia-Partial-Component') === $this->component)
+        $props = ($only && $request->getHeaderLine('X-Inertia-Partial-Component') === $this->component)
             ? Arr::only($this->props, $only)
             : array_filter($this->props, static function ($prop) {
                 return ! $prop instanceof LazyProp;
