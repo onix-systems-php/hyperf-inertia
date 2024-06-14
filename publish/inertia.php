@@ -13,7 +13,7 @@ return [
     'root_view' => 'inertia',
     'public_path_prefix' => __DIR__ . '/../../storage/public',
     'asset_public_path' => env('DOMAIN_API') . '/public',
-    'skip_url_prefix' => env('INERTIA_SKIP_URL_PREFIX', []),
+    'skip_url_prefix' => env('INERTIA_SKIP_URL_PREFIX', ''),
     'is_secure' => env('INERTIA_IS_SECURE', true),
 
 
