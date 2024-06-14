@@ -108,4 +108,4 @@ Or read the [inertia](https://inertiajs.com/server-side-rendering) documentation
 - ``` INERTIA_SSR_ENABLED ``` - If you are using ssr, set to true. By default false.
 - ``` INERTIA_SSR_URL ``` -  URL of the ssr server. By default http://127.0.0.1:13714.
 - ``` INERTIA_IS_SECURE ``` - If you are using http, set to false. By default true.
-- ``` INERTIA_SKIP_URL_PREFIX ``` - If you need to skip url, set to prefix. prefixes should be specified as a string using the separator ``,``. By default empty string. Example ``` api/v1,api/v2 ```. All requests starting with this prefix will be skipped in inertia.
+- ``` INERTIA_SKIP_URL_PREFIX ``` - If you need to skip url, set to prefix. Prefixes should be specified as a string using the separator ``,``. By default empty string. Example ``` api/v1,api/v2 ```. All requests starting with this prefix will be skipped in inertia.
