@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OnixSystemsPHP\HyperfInertia;
 
 use Hyperf\Context\Context;
+use Hyperf\Stringable\Str;
 use Hyperf\ViewEngine\Http\Middleware\ValidationExceptionHandle as BaseValidationExceptionHandler;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -28,8 +29,8 @@ class Middleware extends BaseValidationExceptionHandler
 
         $this->session->setPreviousUrl($request->url());
 
-        $url = $request->getUri()->getPath();
-        if ($this->isSkipped($url)) {
+        $path = $request->getUri()->getPath();
+        if ($this->isSkipped($path)) {
             return $handler->handle($request);
         }
 
@@ -159,9 +160,18 @@ class Middleware extends BaseValidationExceptionHandler
         });
     }
 
-    private function isSkipped($request_url): bool
+    private function isSkipped(string $path): bool
     {
-        $segments = explode('/', trim($request_url, '/'));
+        $path = trim($path, '/');
+        $found = array_reduce(config('inertia.no_skip_extra_path'), function ($carry, $item) use ($path) {
+            return $carry || Str::startsWith($item, $path);
+        }, false);
+
+        if ($found) {
+            return false;
+        }
+
+        $segments = explode('/', $path);
         $prefix = array_shift($segments) ?? null;
 
         return $prefix && in_array($prefix, config('inertia.skip_url_prefix'));
