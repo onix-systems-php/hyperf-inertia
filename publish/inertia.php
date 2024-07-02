@@ -14,6 +14,7 @@ return [
     'public_path_prefix' => __DIR__ . '/../../storage/public',
     'asset_public_path' => env('DOMAIN_API') . '/public',
     'skip_url_prefix' => empty(env('INERTIA_SKIP_URL_PREFIX')) ? [] : explode(',', env('INERTIA_SKIP_URL_PREFIX')),
+    'no_skip_extra_path' => empty(env('INERTIA_NO_SKIP_EXTRA_PATH')) ? [] : explode(',', env('INERTIA_NO_SKIP_EXTRA_PATH')),
     'is_secure' => env('INERTIA_IS_SECURE', true) !== 'false',
 
 

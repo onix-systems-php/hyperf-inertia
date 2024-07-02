@@ -15,8 +15,8 @@ use Hyperf\Contract\Arrayable;
 use Hyperf\HttpMessage\Stream\SwooleStream;
 use Hyperf\HttpMessage\Uri\Uri;
 use Hyperf\HttpServer\Contract\RequestInterface;
+use Hyperf\HttpServer\Contract\ResponseInterface;
 use Hyperf\Macroable\Macroable;
-use Psr\Http\Message\ResponseInterface;
 
 use function Hyperf\Config\config;
 use function Hyperf\Support\call;
