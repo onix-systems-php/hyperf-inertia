@@ -120,6 +120,10 @@ class InertiaInitCommand extends HyperfCommand
 
     private function makeStructure(): void
     {
+        if(!$this->filesystem->exists(self::getInertiaPath())) {
+            $this->filesystem->makeDirectory(path: self::getInertiaPath(), recursive: true);
+        }
+
         $this->filesystem->makeDirectory(path: self::getInertiaPath() . '/js/Components', recursive: true);
         $this->filesystem->makeDirectory(path: self::getInertiaPath() . '/js/Pages', recursive: true);
         $this->filesystem->makeDirectory(path: self::getInertiaPath() . '/js/Layouts', recursive: true);
