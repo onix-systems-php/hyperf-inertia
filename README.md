@@ -118,7 +118,7 @@ Or read the [inertia](https://inertiajs.com/server-side-rendering) documentation
 - ``` INERTIA_SSR_URL ``` -  URL of the ssr server. By default http://127.0.0.1:13714.
 - ``` INERTIA_IS_SECURE ``` - If you are using http, set to false. By default true.
 - ``` INERTIA_SKIP_URL_PREFIX ``` - If you need to skip url, set to prefix. Prefixes should be specified as a string using the separator ``,``. By default empty string. Example ``` v1,api ```. All requests starting with this prefix will be skipped in inertia.
-- ``` INERTIA_NO_SKIP_EXTRA_PATH ``` When prefix exist in to ``` INERTIA_SKIP_URL_PREFIX ```,  but an exception must be made for a separate path. The extra path should be specified as a string using the separator ``,``. By default empty string. Example ``` admin/login,admin/forgot ```.
+- ``` INERTIA_NO_SKIP_EXTRA_PATH ``` When prefix exist in to ``` INERTIA_SKIP_URL_PREFIX ```, but an exception must be made for a separate path. The extra path should be specified as a string using the separator ``,``. By default empty string. Example ``` admin/login,admin/forgot ```.
 
 ## Examples of frontend files
 In the package you can find example files for the frontend. vendor/onix-systems-php/hyperf-inertia/example There is also an example controller here.
