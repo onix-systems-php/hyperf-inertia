@@ -46,27 +46,36 @@ Next we need to setup the Inertia middleware, in file `./config/middlewares.php`
 ## Creating responses
 
 ```php
-#[GetMapping(path: '/test', options: ['name' => 'test'])]
-public function test(RequestInterface $request)
-{
-    return inertia('Home', ['payload' => 'inertia'])->toResponse($request);
-}
+    #[GetMapping(path: '/test-feedback')]
+    public function test(RequestInterface $request)
+    {
+        return inertia('Test', [
+            'title' => 'Feedback form',
+            'formTitle' => "What's on your mind?"
+        ])->toResponse($request);
+    }
 ```
 
 ```php
-#[PostMapping(path: '/test', options: ['name' => 'test'])]
-public function login(RequestLogin $request, LoginUserService $loginUserService)
-{
-    try {
-        $loginUserService->run(LoginDTO::make($request), $this->authManager->tokenGuard());
-    } catch (\Exception $exception) {
-        return redirect_with('test', ['alert' => [
-            'type' => 'error',
-            'message' => $exception->getMessage(),
-        ]]);
+    #[PostMapping('/test-feedback')]
+    public function testFeedback(RequestInterface $request)
+    {
+        $rules = [
+            'fullname' => 'required|string|min:3|max:255',
+            'email' => 'required|email',
+            'message' => 'required|string|min:10|max:255',
+        ];
+
+        $validator = $this->validationFactory->make($request->all(), $rules);
+        $validator->validate();
+
+        return redirect_with('test-feedback', [
+            'alert' => [
+                'message' => 'Feedback was successfully sent',
+                'type' => 'success',
+            ],
+        ]);
     }
-    return redirect_with('test');
-}
 ```
 
 ## Frontend Part
@@ -110,3 +119,10 @@ Or read the [inertia](https://inertiajs.com/server-side-rendering) documentation
 - ``` INERTIA_IS_SECURE ``` - If you are using http, set to false. By default true.
 - ``` INERTIA_SKIP_URL_PREFIX ``` - If you need to skip url, set to prefix. Prefixes should be specified as a string using the separator ``,``. By default empty string. Example ``` v1,api ```. All requests starting with this prefix will be skipped in inertia.
 - ``` INERTIA_NO_SKIP_EXTRA_PATH ``` When prefix exist in to ``` INERTIA_SKIP_URL_PREFIX ```,  but an exception must be made for a separate path. The extra path should be specified as a string using the separator ``,``. By default empty string. Example ``` admin/login,admin/forgot ```.
+
+## Examples of frontend files
+In the package you can find example files for the frontend. vendor/onix-systems-php/hyperf-inertia/example There is also an example controller here.
+- It is necessary to connect styles in inertia.blade.php ```<link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">```
+
+> **Note**
+> If you are using arm64, you need to add ``@rollup/rollup-darwin-arm64``, this is only for svelte
