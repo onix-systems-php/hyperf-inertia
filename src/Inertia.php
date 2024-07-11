@@ -110,6 +110,9 @@ class Inertia
                 ->withBody(new SwooleStream(''));
         }
 
-        return $response->redirect($url instanceof Uri ? $url->toString() : $url);
+        return $response->redirect(
+            toUrl:$url instanceof Uri ? $url->toString() : $url,
+            schema: $request->getUri()->getScheme()
+        );
     }
 }
