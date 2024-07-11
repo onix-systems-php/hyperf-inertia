@@ -10,6 +10,7 @@ use Hyperf\Context\ApplicationContext;
 use Hyperf\Context\Context;
 use Hyperf\Contract\Arrayable;
 use Hyperf\Contract\SessionInterface;
+use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
 use OnixSystemsPHP\HyperfInertia\Inertia;
 
@@ -38,11 +39,12 @@ if (! function_exists('inertia')) {
 if (! function_exists('redirect_with')) {
     function redirect_with($path = '/', $data = [])
     {
+        $request = ApplicationContext::getContainer()->get(RequestInterface::class);
         $response = ApplicationContext::getContainer()->get(ResponseInterface::class);
         $session = ApplicationContext::getContainer()->get(SessionInterface::class);
         collect($data)->each(fn ($value, $key) => $session->flash($key, $value));
 
-        return $response->redirect($path);
+        return $response->redirect(toUrl: $path, schema: $request->getUri()->getScheme());
     }
 }
 if (! function_exists('inertia_location')) {
