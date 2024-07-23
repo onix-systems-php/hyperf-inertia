@@ -53,7 +53,6 @@ class InertiaInitCommand extends HyperfCommand
                 'svelte' => '^4.*',
                 '@inertiajs/svelte' => '^1.*',
                 '@sveltejs/vite-plugin-svelte' => '^3.*',
-                '@vue/compiler-sfc' => '^3.*',
                 'laravel-vite-plugin' => '^1.0.2',
             ],
             'ssr' => [],
